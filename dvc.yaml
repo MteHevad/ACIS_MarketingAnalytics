@@ -1,16 +1,1 @@
 
----
-
-### `requirements.txt`
-
-```txt
-# Data analysis libraries
-pandas
-numpy
-matplotlib
-seaborn
-scikit-learn
-
-# DVC for data version control
-dvc
-
