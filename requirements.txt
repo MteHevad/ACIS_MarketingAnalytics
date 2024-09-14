@@ -1,18 +1,2 @@
-## Requirements
 
-- Git and GitHub setup.
-- Python environment with DVC and necessary libraries for data analysis.
-- A well-organized branching strategy with frequent commits and descriptive commit messages.
-
----
-
-## Installation and Setup
-
-1. Clone the repository from GitHub:
-   ```bash
-   git clone https://github.com/yourusername/project-repo.git
-   cd project-repo
-
-pip install -r requirements.txt
-dvc init
 
