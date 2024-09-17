@@ -1,17 +1,13 @@
-## Requirements
-
-- Git and GitHub setup.
-- Python environment with DVC and necessary libraries for data analysis.
-- A well-organized branching strategy with frequent commits and descriptive commit messages.
-
----
-
-## Installation and Setup
-
-1. Clone the repository from GitHub:
-   ```bash
-   git clone https://github.com/yourusername/project-repo.git
-   cd project-repo
-
-pip install -r requirements.txt
-dvc init
+1. Software:
+- Python 3.6+
+- Python libraries: Pandas, NumPy, Matplotlib, Seaborn, SciPy, Scikit-learn, XGBoost, SHAP
+- DVC for data version control
+- Git for version control
+2. Hardware:
+- A computer with sufficient memory and processing power to handle data and perform computations.
+3. Data:
+- Access to the required datasets in appropriate formats (CSV, etc.).
+4. Tools:
+- A code editor or IDE for scripting.
+- Command-line interface for executing DVC and Git commands.
+This setup will enable you to effectively perform the tasks required for data analysis, version control, hypothesis testing, and statistical modeling.
