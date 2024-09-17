@@ -2,68 +2,105 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from scipy import stats
-from scipy.stats import chi2_contingency
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import accuracy_score
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report, confusion_matrix
-import warnings
-warnings.filterwarnings('ignore')
 
-# Load the data
-df = pd.read_csv('C:/Users/hp/Desktop/KAIM/Week 3/insurance_data.csv')
+# Load the dataset from the provided path
+file_path = r'C:\Users\hp\Desktop\KAIM\Week 3\insurance_data.csv'
+data = pd.read_csv(file_path)
 
-# Display basic information about the dataset
-print(df.info())
+# Display the first few rows of the data to verify successful loading
+print(data.head())
 
-# Display the first few rows of the dataset
-print("\
-First few rows of the dataset:")
-print(df.head())
+# Print available columns to verify the presence of 'TotalPremium' or similar
+print("Available columns:", data.columns)
 
-# Display summary statistics
-print("\
-Summary statistics:")
-print(df.describe())
+# Strip any leading or trailing spaces from column names
+data.columns = data.columns.str.strip()
 
-# Check for missing values
-print("\
-Missing values:")
-print(df.isnull().sum())
+# Check if 'TotalPremium' exists or find similar column names
+if 'TotalPremium' in data.columns:
+    print("'TotalPremium' column is present.")
+else:
+    # Search for columns containing 'Premium' and suggest alternatives
+    premium_columns = [col for col in data.columns if 'Premium' in col]
+    print(f"Did you mean one of these columns? {premium_columns}")
 
-print("Data loaded and initial exploration completed.")
+# Selecting only numerical columns for descriptive statistics and filling missing values
+numerical_columns = data.select_dtypes(include=[np.number]).columns
 
-# EDA: Visualizations
-plt.figure(figsize=(12, 5))
+# Variability of numerical features (e.g., 'TotalPremium' and 'TotalClaims')
+if 'TotalPremium' in numerical_columns:
+    total_premium_var = data['TotalPremium'].var()
+    print(f"Variance of TotalPremium: {total_premium_var}")
 
-# Claims by Province
-plt.subplot(121)
-df['Province'].value_counts().plot(kind='bar')
-plt.title('Claims by Province')
-plt.xlabel('Province')
-plt.ylabel('Count')
+if 'TotalClaims' in numerical_columns:
+    total_claims_var = data['TotalClaims'].var()
+    print(f"Variance of TotalClaims: {total_claims_var}")
 
-# Claims by Gender
-plt.subplot(122)
-df['Gender'].value_counts().plot(kind='bar')
-plt.title('Claims by Gender')
-plt.xlabel('Gender')
-plt.ylabel('Count')
+# Summary statistics for all numerical columns
+summary_stats = data[numerical_columns].describe()
+print("Summary Statistics for numerical columns:\n", summary_stats)
 
-plt.tight_layout()
-plt.savefig('claims_distribution.png')
-plt.close()
+# Fill missing values for numerical columns only using the median
+data[numerical_columns] = data[numerical_columns].fillna(data[numerical_columns].median())
 
-# Hypothesis Testing: Chi-square test for independence
-contingency_table = pd.crosstab(df['Province'], df['Claimed'])
-chi2, p_value, dof, expected = stats.chi2_contingency(contingency_table)
+# Display missing values after imputation
+missing_values_after = data.isnull().sum()
+print("Missing Values after filling numerical columns:\n", missing_values_after)
 
-print("Chi-square test results:")
-print(f"Chi-square statistic: {chi2}")
-print(f"p-value: {p_value}")
+# Plotting histograms for numerical columns
+for col in numerical_columns:
+    if col in data.columns:
+        plt.figure(figsize=(8, 6))
+        sns.histplot(data[col], bins=30, kde=True)
+        plt.title(f'Histogram of {col}')
+        plt.show()
 
+# Plotting bar charts for categorical columns
+categorical_columns = data.select_dtypes(include=['object']).columns  # Extract only categorical columns
+for col in categorical_columns:
+    if col in data.columns:
+        plt.figure(figsize=(8, 6))
+        sns.countplot(x=col, data=data)
+        plt.title(f'Countplot of {col}')
+        plt.show()
+
+# Scatter plot and correlation matrix for 'TotalPremium' vs 'TotalClaims' by PostalCode
+if 'TotalPremium' in numerical_columns and 'TotalClaims' in numerical_columns and 'PostalCode' in data.columns:
+    plt.figure(figsize=(10, 6))
+    sns.scatterplot(x='TotalPremium', y='TotalClaims', hue='PostalCode', data=data)
+    plt.title('TotalPremium vs TotalClaims by PostalCode')
+    plt.show()
+
+# Correlation matrix for numerical columns
+correlation_matrix = data[numerical_columns].corr()
+print("Correlation Matrix:\n", correlation_matrix)
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
+plt.title('Correlation Heatmap')
+plt.show()
+
+# Box plots to detect outliers in numerical data
+for col in numerical_columns:
+    if col in data.columns:
+        plt.figure(figsize=(8, 6))
+        sns.boxplot(data[col])
+        plt.title(f'Boxplot of {col}')
+        plt.show()
+
+# Pairplot for numerical features only
+sns.pairplot(data[numerical_columns])
+plt.show()
+
+# Barplot comparing provinces by TotalPremium (if 'Province' is a categorical column)
+if 'Province' in categorical_columns and 'TotalPremium' in numerical_columns:
+    plt.figure(figsize=(10, 6))
+    sns.barplot(x='Province', y='TotalPremium', data=data, estimator=np.mean)
+    plt.title('Average TotalPremium by Province')
+    plt.xticks(rotation=45)
+    plt.show()
+
+# Countplot for Gender (if 'Gender' is a categorical column)
+if 'Gender' in categorical_columns:
+    plt.figure(figsize=(8, 6))
+    sns.countplot(x='Gender', data=data)
+    plt.title('Distribution of Gender')
+    plt.show()
